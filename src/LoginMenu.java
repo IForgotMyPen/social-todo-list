@@ -23,35 +23,32 @@ public class LoginMenu {
           "Select an option by inserting the respective number and hitting 'Enter':");
     }
 
-    // Options menu
-    System.out.print("""
-        1. Log in to an existing account
-        2. Create a new account
-        3. Exit The SocialList
-        """);
-
     // Declare userChoice
     // Note: different than userInput, which is raw integer input (without checking for valid range)
-    int userChoice = -1;
+    int userChoice;
 
-    // Checking for a valid input type & integer value
-    if (scnr.hasNextInt()) {
-      int userInput = scnr.nextInt();
-      if (userInput >= 1 && userInput <= 3) {
-        userChoice = userInput;
+    boolean validInput = false;
+    do {
+      // Options menu
+      System.out.print("""
+          1. Log in to an existing account
+          2. Create a new account
+          3. Exit The SocialList
+          """);
+
+      // Checking for a valid input type & integer value
+      if (scnr.hasNextInt()) {
+        int userInput = scnr.nextInt();
+        if (userInput >= 1 && userInput <= 3) {
+          validInput = true;
+          userChoice = userInput;
+        } else {
+          System.out.println("Invalid integer value, please try again:");
+        }
       } else {
-        System.out.println("Invalid integer value, please try again:");
-        loginOptions(scnr, false);
+        System.out.println("That input was unrecognized, please try again:");
+        scnr.next();
       }
-    } else {
-      System.out.println("That input was unrecognized, please try again:");
-      scnr.next();
-      loginOptions(scnr, false);
-    }
-
-    // Printing success message, meaning the user inserted a valid integer
-    if (userChoice != -1) {
-      System.out.println("Success!");
-    }
+    } while (!validInput);
   }
 }

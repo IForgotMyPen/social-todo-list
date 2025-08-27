@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
@@ -8,7 +9,7 @@ public class LoginMenu {
   // FIELDS ----------------------------------------------------------------------------------------
 
   private static final File userLoginInfo = new File("src/login-info.txt");
-  private static final ArrayList<User> userList = makeUserList();
+  private static ArrayList<User> userList = makeUserList();
 
   // MAIN METHOD -----------------------------------------------------------------------------------
 
@@ -29,7 +30,7 @@ public class LoginMenu {
 
         // Choice: create a new account
         if (userChoice == 2) {
-
+          createNewAccount(scnr);
         }
 
         // Choice: exit the program
@@ -60,7 +61,7 @@ public class LoginMenu {
           "Select an option by inserting the respective number and hitting 'Enter':");
     }
 
-    // Note: different than userInput, which is raw integer input (without checking for valid range)
+    // Note: different from userInput, which is raw integer input (without checking for valid range)
     int userChoice = -1;
 
     // For the following do-while loop
@@ -109,7 +110,8 @@ public class LoginMenu {
           successfulLogin = true;
           user.toggleLoggedIn();
           System.out.println("You have successfully logged in.");
-          System.out.println("Welcome, " + user.getUsername() + ".");
+          System.out.println("Welcome, " + user.getUsername() + ".\nFIX:RETURNING TO MAIN MENU...");
+          // TODO: redirect to new class with user options
         }
       }
       // Case: user did not successfully log into an existing account, they now have the choice
@@ -136,6 +138,7 @@ public class LoginMenu {
         }
         // Here we break the do-while loop to go back to the main method
         else if (userTryAgainInput.equalsIgnoreCase("n")) {
+          System.out.println("Exiting to main menu...");
           break;
         }
       }
@@ -144,7 +147,36 @@ public class LoginMenu {
 
   // This method correlates to userChoice == 2
   private static void createNewAccount(Scanner scnr) {
+    System.out.println("You are creating a new SocialList account.");
 
+    // Create a new fileWriter object for modifying login info text document
+    try (FileWriter fileOutput = new FileWriter(userLoginInfo, true)) {
+      boolean validInput = false;
+      // Loop until we get a valid input (not blank)
+      do {
+        System.out.print("Enter new username: ");
+        String username = scnr.next();
+
+        System.out.print("Enter new password: ");
+        String password = scnr.next();
+
+        if (!username.isBlank() && !password.isBlank()) {
+          System.out.println("Thank you for creating a SocialList account!\nFIX:RETURNING TO MAIN MENU...");
+          validInput = true;
+          // write the new username and password to the file
+          fileOutput.write(username + " " + password + "\n");
+          fileOutput.close();
+          // we want to update the user list to include the new user, in case they log out and want to log back in
+          userList.add(new User(username, password));
+          // TODO: redirect to new class with user options
+        } else {
+          System.out.println("Username and/or password cannot be blank, try again: ");
+        }
+      } while (!validInput);
+
+    } catch (java.io.IOException e) {
+      System.out.println("ERROR in createNewAccount() method: fileWriter failed.");
+    }
   }
 
   // This method correlates to userChoice == 3

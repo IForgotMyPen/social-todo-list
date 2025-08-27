@@ -1,3 +1,9 @@
+// Things left to complete in this class:
+// - redirection when logging into an account
+// - redirection when creating a new account (ask if they want to log in right away)
+// - back button for login
+// - back button for creating an account
+
 import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.ArrayList;

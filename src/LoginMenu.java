@@ -3,8 +3,6 @@
 // - redirection when creating a new account (ask if they want to log in right away)
 // - back button for login
 // - back button for creating an account
-// - make sure that a new account isn't created with the same username as another account
-//   - ask to try again in this case
 
 import java.io.FileWriter;
 import java.util.Scanner;
@@ -52,6 +50,11 @@ public class LoginMenu {
   }
 
   // METHODS ---------------------------------------------------------------------------------------
+
+  // Checks whether a string is the back command
+  private static boolean cmdBack(String input) {
+    return input.equalsIgnoreCase("cmd:back");
+  }
 
   private static int loginOptions(Scanner scnr, boolean withIntroMessage) {
     // Here we want to present users with a menu that contains a few different options:
@@ -102,14 +105,23 @@ public class LoginMenu {
   // This method correlates to userChoice == 1
   private static void loginToExistingAccount(Scanner scnr) {
     System.out.println("You are attempting to log in to an existing SocialList account.");
+    System.out.println("You may input 'cmd:back' for the username or password to return to the main menu");
 
     // For the following do-while loop
     boolean successfulLogin = false;
     do {
       System.out.print("Enter username: ");
       String inputUsername = scnr.next();
+      if (cmdBack(inputUsername)) {
+        System.out.println("Returning to main menu...");
+        return;
+      }
       System.out.print("Enter password: ");
       String inputPassword = scnr.next();
+      if (cmdBack(inputPassword)) {
+        System.out.println("Returning to main menu...");
+        return;
+      }
 
       // Loop through all the users in the userList, and see if there is a match. If there is, we
       // break the do-while loop, and toggle the user to be logged in.
@@ -141,6 +153,7 @@ public class LoginMenu {
   // This method correlates to userChoice == 2
   private static void createNewAccount(Scanner scnr) {
     System.out.println("You are creating a new SocialList account.");
+    System.out.println("You may input 'cmd:back' for the username or password to return to the main menu");
 
     // Create a new fileWriter object for modifying login info text document
     try (FileWriter fileOutput = new FileWriter(userLoginInfo, true)) {
@@ -149,8 +162,16 @@ public class LoginMenu {
       do {
         System.out.print("Enter new username: ");
         String username = scnr.next();
+        if (cmdBack(username)) {
+          System.out.println("Returning to main menu...");
+          return;
+        }
         System.out.print("Enter new password: ");
         String password = scnr.next();
+        if (cmdBack(username)) {
+          System.out.println("Returning to main menu...");
+          return;
+        }
 
         // Check for valid input (not blank)
         if (username.isBlank() || password.isBlank()) {

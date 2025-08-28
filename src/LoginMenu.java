@@ -3,6 +3,8 @@
 // - redirection when creating a new account (ask if they want to log in right away)
 // - back button for login
 // - back button for creating an account
+// - make sure that a new account isn't created with the same username as another account
+//   - ask to try again in this case
 
 import java.io.FileWriter;
 import java.util.Scanner;
@@ -20,7 +22,7 @@ public class LoginMenu {
   // MAIN METHOD -----------------------------------------------------------------------------------
 
   public static void main(String[] args) {
-    // Scanner object to pass to methods (may just want to make this a field)
+    // Scanner object to pass to methods
     Scanner scnr = new Scanner(System.in);
 
     // For the following do-while loop
@@ -125,26 +127,11 @@ public class LoginMenu {
       if (!successfulLogin) {
         System.out.println("That username and/or password is incorrect.");
 
-        // Try again loop, basically declare an empty string, and ask the user y/n until they enter
-        // a valid input.
-        String userTryAgainInput = "";
-        do {
-          System.out.print("Would you like to try to login again? (y/n): ");
-          String rawUserTryAgainInput = scnr.next();
-          if (rawUserTryAgainInput.equalsIgnoreCase("y") ||
-          rawUserTryAgainInput.equalsIgnoreCase("n")) {
-            userTryAgainInput = rawUserTryAgainInput;
-          } else {
-            System.out.println("Unrecognized input, try again.");
-          }
-        } while (userTryAgainInput.isEmpty());
-        // Don't do anything in this case, just keep do-while looping
-        if (userTryAgainInput.equalsIgnoreCase("y")) {
+        // See if the user would like to try again
+        if (tryAgain(scnr)) {
           continue;
-        }
-        // Here we break the do-while loop to go back to the main method
-        else if (userTryAgainInput.equalsIgnoreCase("n")) {
-          System.out.println("Exiting to main menu...");
+        } else {
+          System.out.println("Returning to main menu...");
           break;
         }
       }
@@ -157,32 +144,72 @@ public class LoginMenu {
 
     // Create a new fileWriter object for modifying login info text document
     try (FileWriter fileOutput = new FileWriter(userLoginInfo, true)) {
-      boolean validInput = false;
-      // Loop until we get a valid input (not blank)
+
+      boolean successfulAccountCreation = false;
       do {
         System.out.print("Enter new username: ");
         String username = scnr.next();
-
         System.out.print("Enter new password: ");
         String password = scnr.next();
 
-        if (!username.isBlank() && !password.isBlank()) {
-          System.out.println("Thank you for creating a SocialList account!\nFIX:RETURNING TO MAIN MENU...");
-          validInput = true;
-          // write the new username and password to the file
-          fileOutput.write(username + " " + password + "\n");
-          fileOutput.close();
-          // we want to update the user list to include the new user, in case they log out and want to log back in
-          userList.add(new User(username, password));
-          // TODO: redirect to new class with user options
-        } else {
-          System.out.println("Username and/or password cannot be blank, try again: ");
+        // Check for valid input (not blank)
+        if (username.isBlank() || password.isBlank()) {
+          System.out.println("Username or password cannot be blank.");
+          if (tryAgain(scnr)) {
+            continue;
+          } else {
+            System.out.println("Returning to main menu...");
+            break;
+          }
         }
-      } while (!validInput);
 
+        // Check if username is available
+        if (!usernameAvailable(username)) {
+          System.out.println("That username is already in use.");
+          if (tryAgain(scnr)) {
+            continue;
+          } else {
+            System.out.println("Returning to main menu...");
+            break;
+          }
+        }
+        successfulAccountCreation = true;
+        System.out.println("Thank you for creating an account with The SocialList!");
+        // Update the user data text file with the new user info
+        fileOutput.write(username + " " + password + "\n");
+        // Update the user list to include the new user in case they want to log in right away
+        userList.add(new User(username, password));
+      } while (!successfulAccountCreation);
     } catch (java.io.IOException e) {
       System.out.println("ERROR in createNewAccount() method: fileWriter failed.");
     }
+  }
+
+  // Helper method to determine if a user wants to try a certain action again (y/n choice)
+  private static boolean tryAgain(Scanner scnr) {
+    boolean validInput = false;
+    String userInput;
+    do {
+      System.out.print("Would you like to try again? (y/n): ");
+      userInput = scnr.next();
+      if (userInput.equalsIgnoreCase("y") || userInput.equalsIgnoreCase("n")) {
+        validInput = true;
+      } else {
+        System.out.println("Unrecognized input.");
+      }
+    } while (!validInput);
+    // return "true" if the user selected "y", and "false" if the user selected "n"
+    return userInput.equalsIgnoreCase("y");
+  }
+
+  // Helper method to determine if a username is already taken
+  private static boolean usernameAvailable(String username) {
+    for (User user : userList) {
+      if (username.equals(user.getUsername())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   // This method correlates to userChoice == 3

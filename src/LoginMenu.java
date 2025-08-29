@@ -3,7 +3,9 @@
 // - redirection when creating a new account (ask if they want to log in right away)
 // - back button for login
 // - back button for creating an account
+// - check to see if the boolean withIntroMessage is actually doing anything
 
+// This class is for the main login menu, and will redirect to the user menu once the user logs in
 import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.ArrayList;

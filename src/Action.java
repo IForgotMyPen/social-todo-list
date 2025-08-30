@@ -2,7 +2,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Action {
-  // These are some of the things we want to store with Action objects
+
+  // FIELDS ----------------------------------------------------------------------------------------
+
   User user;
   String description;
   String dateAdded;
@@ -10,10 +12,13 @@ public class Action {
   String dateCompleted;
   boolean isComplete;
 
+  // CONSTRUCTOR -----------------------------------------------------------------------------------
+
   public Action(User user, String description, String dateDue) {
     LocalDateTime currentDateTime = LocalDateTime.now();
     DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
+    // The user who created the action
     this.user = user;
     this.description = description;
     this.dateAdded = currentDateTime.format(dateTimeFormat);
@@ -23,6 +28,8 @@ public class Action {
     this.dateCompleted = null;
     this.isComplete = false;
   }
+
+  // GETTERS, SETTERS, & TOGGLES -------------------------------------------------------------------
 
   public String getUser() {
     return this.user.getUsername();

@@ -87,7 +87,9 @@ public class LoginMenu {
         scnr.next();
       }
     } while (!validChoice);
-    return Choices[userChoice];
+    return Choices[userChoice]; // Note that this will cause an error if userChoice is for some
+                                // reason not updated, but I would rather contain that error to this
+                                // method, so I'll leave it
   }
 
   private static void loginToExistingAccount(Scanner scnr) {
@@ -95,7 +97,7 @@ public class LoginMenu {
     System.out.println(
         "You may input 'cmd:back' for the username or password to return to the main menu"
     );
-    
+
     boolean successfulLogin = false; // For the following do-while loop
     do {
       System.out.print("Enter username: ");

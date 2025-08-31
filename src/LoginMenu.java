@@ -19,80 +19,66 @@ public class LoginMenu {
   private static final File userLoginInfo = new File("src/login-info.txt");
   private static ArrayList<User> userList = makeUserList();
 
+  // To help assign user-input integers to a more readable format
+  enum Choice {
+    LOGIN_TO_EXISTING_ACCOUNT,
+    CREATE_NEW_ACCOUNT,
+    EXIT_PROGRAM
+  }
+  private static final Choice[] Choices = new Choice[] {
+      Choice.LOGIN_TO_EXISTING_ACCOUNT, Choice.CREATE_NEW_ACCOUNT, Choice.EXIT_PROGRAM
+  };
+
   // MAIN METHOD -----------------------------------------------------------------------------------
 
   public static void main(String[] args) {
-    // Scanner object to pass to methods
     Scanner scnr = new Scanner(System.in);
 
-    // For the following do-while loop
     boolean isRunning = true;
     do {
-      int userChoice = loginOptions(scnr, true);
-      if (userChoice != -1) {
+      Choice userChoice = loginOptions(scnr, true);
 
-        // Choice: login to an existing account
-        if (userChoice == 1) {
-          loginToExistingAccount(scnr);
+      if (userChoice == Choice.LOGIN_TO_EXISTING_ACCOUNT) {
+        loginToExistingAccount(scnr);
+      }
+
+      if (userChoice == Choice.CREATE_NEW_ACCOUNT) {
+        createNewAccount(scnr);
         }
 
-        // Choice: create a new account
-        if (userChoice == 2) {
-          createNewAccount(scnr);
-        }
-
-        // Choice: exit the program
-        if (userChoice == 3) {
-          isRunning = false;
-          exitProgram();
-        }
-
+      if (userChoice == Choice.EXIT_PROGRAM) {
+        isRunning = false;
+        exitProgram();
       }
     } while (isRunning);
   }
 
   // METHODS ---------------------------------------------------------------------------------------
 
-  // Checks whether a string is the back command
   private static boolean cmdBack(String input) {
     return input.equalsIgnoreCase("cmd:back");
   }
 
-  private static int loginOptions(Scanner scnr, boolean withIntroMessage) {
-    // Here we want to present users with a menu that contains a few different options:
-    //  1. Login to an existing account
-    //  2. Create a new account
-    //  3. Exit the program
-    // Then, based on the user's decision, we redirect to the respective method.
-    // Note: I want to contain the code for this in a separate method so that it is easier
-    //       to call repeatedly.
-
-    // Introduction message, will only show on occasion
+  private static Choice loginOptions(Scanner scnr, boolean withIntroMessage) {
     if (withIntroMessage) {
       System.out.println("Hello, and welcome to The SocialList!");
       System.out.println(
           "Select an option by inserting the respective number and hitting 'Enter':");
     }
 
-    // Note: different from userInput, which is raw integer input (without checking for valid range)
     int userChoice = -1;
-
-    // For the following do-while loop
-    boolean validInput = false;
+    boolean validChoice = false;
     do {
-      // Options menu
       System.out.print("""
           1. Log in to an existing account
           2. Create a new account
           3. Exit The SocialList
           """);
 
-      // Checking for a valid input type & integer value
-      if (scnr.hasNextInt()) {
-        int userInput = scnr.nextInt();
-        if (userInput >= 1 && userInput <= 3) {
-          validInput = true;
-          userChoice = userInput;
+      if (scnr.hasNextInt()) { // Checking for valid input data type
+        userChoice = scnr.nextInt();
+        if (userChoice >= 1 && userChoice <= 3) { // Checking for valid integer range (3 choices)
+          validChoice = true;
         } else {
           System.out.println("Invalid integer value, please try again:");
         }
@@ -100,17 +86,17 @@ public class LoginMenu {
         System.out.println("That input was unrecognized, please try again:");
         scnr.next();
       }
-    } while (!validInput);
-    return userChoice;
+    } while (!validChoice);
+    return Choices[userChoice];
   }
 
-  // This method correlates to userChoice == 1
   private static void loginToExistingAccount(Scanner scnr) {
     System.out.println("You are attempting to log in to an existing SocialList account.");
-    System.out.println("You may input 'cmd:back' for the username or password to return to the main menu");
-
-    // For the following do-while loop
-    boolean successfulLogin = false;
+    System.out.println(
+        "You may input 'cmd:back' for the username or password to return to the main menu"
+    );
+    
+    boolean successfulLogin = false; // For the following do-while loop
     do {
       System.out.print("Enter username: ");
       String inputUsername = scnr.next();
@@ -152,14 +138,13 @@ public class LoginMenu {
     } while (!successfulLogin);
   }
 
-  // This method correlates to userChoice == 2
   private static void createNewAccount(Scanner scnr) {
     System.out.println("You are creating a new SocialList account.");
-    System.out.println("You may input 'cmd:back' for the username or password to return to the main menu");
+    System.out.println(
+        "You may input 'cmd:back' for the username or password to return to the main menu"
+    );
 
-    // Create a new fileWriter object for modifying login info text document
     try (FileWriter fileOutput = new FileWriter(userLoginInfo, true)) {
-
       boolean successfulAccountCreation = false;
       do {
         System.out.print("Enter new username: ");
@@ -175,8 +160,7 @@ public class LoginMenu {
           return;
         }
 
-        // Check for valid input (not blank)
-        if (username.isBlank() || password.isBlank()) {
+        if (username.isBlank() || password.isBlank()) { // Check for valid input (not blank)
           System.out.println("Username or password cannot be blank.");
           if (tryAgain(scnr)) {
             continue;
@@ -186,7 +170,6 @@ public class LoginMenu {
           }
         }
 
-        // Check if username is available
         if (!usernameAvailable(username)) {
           System.out.println("That username is already in use.");
           if (tryAgain(scnr)) {
@@ -225,7 +208,7 @@ public class LoginMenu {
     return userInput.equalsIgnoreCase("y");
   }
 
-  // Helper method to determine if a username is already taken
+  // Helper method to determine if a username is available
   private static boolean usernameAvailable(String username) {
     for (User user : userList) {
       if (username.equals(user.getUsername())) {
@@ -235,12 +218,11 @@ public class LoginMenu {
     return true;
   }
 
-  // This method correlates to userChoice == 3
   private static void exitProgram() {
     System.out.println("Thank you for visiting The SocialList. Have a great day!");
   }
 
-  // This method is used to create an ArrayList of User objects
+  // This method is used to create an ArrayList of User objects for use in the rest of class
   private static ArrayList<User> makeUserList() {
     ArrayList<User> userList = new ArrayList<>();
     try (Scanner fileReader = new Scanner(userLoginInfo)) {

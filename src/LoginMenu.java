@@ -66,7 +66,7 @@ public class LoginMenu {
           "Select an option by inserting the respective number and hitting 'Enter':");
     }
 
-    int userChoice = -1;
+    int userChoice = 0;
     boolean validChoice = false;
     do {
       System.out.print("""
@@ -87,7 +87,7 @@ public class LoginMenu {
         scnr.next();
       }
     } while (!validChoice);
-    return Choices[userChoice]; // Note that this will cause an error if userChoice is for some
+    return Choices[userChoice - 1]; // Note that this will cause an error if userChoice is for some
                                 // reason not updated, but I would rather contain that error to this
                                 // method, so I'll leave it
   }

@@ -28,7 +28,7 @@ public class MainMenu {
   // The main menu options, will return an int to the main method
   private static Choice menuOptions(Scanner scnr) {
     // Note: different from userInput, which is raw integer input (without checking for valid range)
-    int userChoice = -1;
+    int userChoice = 0;
     boolean validChoice = false;
     do {
       System.out.print("""
@@ -54,7 +54,7 @@ public class MainMenu {
         scnr.next();
       }
     } while (!validChoice);
-    return Choices[userChoice]; // Note that this will cause an error if userChoice is for some
+    return Choices[userChoice - 1]; // Note that this will cause an error if userChoice is for some
                                 // reason not updated, but I would rather contain that error to this
                                 // method, so I'll leave it
   }
